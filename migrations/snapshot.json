@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "tables": {
+    "requests": {
+      "columns": {
+        "id": {
+          "type": "id",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "hostId": {
+          "type": "integer",
+          "notNull": true
+        },
+        "hostName": {
+          "type": "text"
+        },
+        "userId": {
+          "type": "varchar",
+          "length": 255,
+          "notNull": true
+        },
+        "username": {
+          "type": "text"
+        },
+        "reason": {
+          "type": "text"
+        },
+        "ticket": {
+          "type": "text"
+        },
+        "hours": {
+          "type": "integer",
+          "notNull": true
+        },
+        "status": {
+          "type": "varchar",
+          "length": 16,
+          "notNull": true,
+          "defaultValue": "pending"
+        },
+        "createdAt": {
+          "type": "timestamp",
+          "notNull": true,
+          "defaultNow": true
+        },
+        "decidedBy": {
+          "type": "varchar",
+          "length": 255
+        },
+        "decidedByName": {
+          "type": "text"
+        },
+        "decidedAt": {
+          "type": "timestamp"
+        },
+        "comment": {
+          "type": "text"
+        },
+        "startsAt": {
+          "type": "timestamp"
+        },
+        "expiresAt": {
+          "type": "timestamp"
+        },
+        "endedAt": {
+          "type": "timestamp"
+        },
+        "endedBy": {
+          "type": "varchar",
+          "length": 255
+        }
+      },
+      "indexes": [
+        {
+          "name": "idx_privileged_access_requests_status",
+          "columns": [
+            "status"
+          ]
+        },
+        {
+          "name": "idx_privileged_access_requests_user_host",
+          "columns": [
+            "userId",
+            "hostId"
+          ]
+        }
+      ]
+    }
+  }
+}
