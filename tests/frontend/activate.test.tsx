@@ -118,7 +118,7 @@ describe("privileged access frontend", () => {
     rendered.renderTab("access");
     fireEvent.click(await screen.findByText("To decide"));
     expect(await screen.findByText("OPS-12")).toBeTruthy();
-    fireEvent.click(screen.getByLabelText("Approve"));
+    fireEvent.click(screen.getByRole("button", { name: "Approve" }));
     const buttons = await screen.findAllByText("Approve");
     fireEvent.click(buttons[buttons.length - 1]);
     await vi.waitFor(() =>
