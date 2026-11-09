@@ -12,9 +12,12 @@ import {
   Facts,
   ListBadge,
   ListRow,
-  ListRowAction,
+  LoadingState,
   NumberField,
+  PANEL,
+  PanelFrame,
   PanelList,
+  PanelShell,
   SelectField,
   TabStrip,
   TextAreaField,
@@ -97,7 +100,7 @@ function RequestForm({
 
   const host = hosts?.find((entry) => String(entry.id) === picked) ?? null;
 
-  if (hosts === null) return null;
+  if (hosts === null) return <LoadingState />;
   if (hosts.length === 0) {
     return (
       <EmptyState
@@ -126,7 +129,7 @@ function RequestForm({
   };
 
   return (
-    <div className="flex max-w-xl flex-col gap-3 p-3">
+    <div className={`flex max-w-xl flex-col gap-3 ${PANEL.body}`}>
       <SelectField
         label={t("request.host")}
         value={picked}
@@ -230,42 +233,48 @@ function RequestRows({
               </Facts>
             }
             trailing={
-              <>
+              <div className="flex items-center gap-1.5">
                 {view === "pending" && (
                   <>
-                    <ListRowAction
-                      label={t("list.approve")}
-                      onClick={() => onApprove(row)}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onApprove(row);
+                      }}
                     >
-                      <span className="text-xs">{t("list.approve")}</span>
-                    </ListRowAction>
-                    <ListRowAction
-                      label={t("list.deny")}
-                      tone="destructive"
-                      onClick={() => onDeny(row)}
+                      {t("list.approve")}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeny(row);
+                      }}
                     >
-                      <span className="text-xs">{t("list.deny")}</span>
-                    </ListRowAction>
+                      {t("list.deny")}
+                    </Button>
                   </>
                 )}
                 {(row.status === "pending" && view === "mine") || active ? (
-                  <ListRowAction
-                    label={
-                      row.status === "pending"
-                        ? t("list.cancel")
-                        : t("list.endNow")
-                    }
-                    tone="destructive"
-                    onClick={() => onEnd(row)}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEnd(row);
+                    }}
                   >
-                    <span className="text-xs">
-                      {row.status === "pending"
-                        ? t("list.cancel")
-                        : t("list.endNow")}
-                    </span>
-                  </ListRowAction>
+                    {row.status === "pending"
+                      ? t("list.cancel")
+                      : t("list.endNow")}
+                  </Button>
                 ) : null}
-              </>
+              </div>
             }
           />
         );
@@ -350,66 +359,82 @@ export function AccessTab({ hostId }: { hostId?: number }) {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
-      <TabStrip
-        tabs={tabs}
-        activeTab={view}
-        onTabChange={(id) => setView(id as View)}
-        trailing={
-          view === "history" ? (
-            <Button variant="outline" size="sm" onClick={() => void download()}>
-              <Download className="size-3.5" />
-              {t("list.export")}
-            </Button>
-          ) : undefined
+    <PanelFrame>
+      <PanelShell
+        icon={<KeyRound className="size-4" />}
+        title={t("tab.title")}
+        tabs={
+          <TabStrip
+            tabs={tabs}
+            activeTab={view}
+            onTabChange={(id) => setView(id as View)}
+            trailing={
+              view === "history" ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void download()}
+                >
+                  <Download className="size-3.5" />
+                  {t("list.export")}
+                </Button>
+              ) : undefined
+            }
+          />
         }
-      />
-      {view === "request" ? (
-        <RequestForm api={api} hostId={hostId} onDone={() => setView("mine")} />
-      ) : (
-        <RequestRows
-          rows={rows}
-          view={view}
-          onApprove={(row) =>
-            void (async () => {
-              const ok = await confirm({
-                title: t("list.approveConfirm", {
-                  user: row.username ?? row.userId,
-                  host: row.hostName ?? row.hostId,
-                  count: row.hours,
-                }),
-                confirmLabel: t("list.approve"),
-                destructive: false,
-              });
-              if (ok) await act(() => api.approve(row.id), t("list.approved"));
-            })()
-          }
-          onDeny={(row) =>
-            void (async () => {
-              const ok = await confirm({
-                title: t("list.denyConfirm"),
-                confirmLabel: t("list.deny"),
-              });
-              if (ok) await act(() => api.deny(row.id), t("list.denied"));
-            })()
-          }
-          onEnd={(row) =>
-            void (async () => {
-              const ok = await confirm({
-                title:
-                  row.status === "pending"
-                    ? t("list.cancelConfirm")
-                    : t("list.endConfirm"),
-                confirmLabel:
-                  row.status === "pending"
-                    ? t("list.cancel")
-                    : t("list.endNow"),
-              });
-              if (ok) await act(() => api.end(row.id), t("list.ended"));
-            })()
-          }
-        />
-      )}
-    </div>
+      >
+        {view === "request" ? (
+          <RequestForm
+            api={api}
+            hostId={hostId}
+            onDone={() => setView("mine")}
+          />
+        ) : (
+          <RequestRows
+            rows={rows}
+            view={view}
+            onApprove={(row) =>
+              void (async () => {
+                const ok = await confirm({
+                  title: t("list.approveConfirm", {
+                    user: row.username ?? row.userId,
+                    host: row.hostName ?? row.hostId,
+                    count: row.hours,
+                  }),
+                  confirmLabel: t("list.approve"),
+                  destructive: false,
+                });
+                if (ok)
+                  await act(() => api.approve(row.id), t("list.approved"));
+              })()
+            }
+            onDeny={(row) =>
+              void (async () => {
+                const ok = await confirm({
+                  title: t("list.denyConfirm"),
+                  confirmLabel: t("list.deny"),
+                });
+                if (ok) await act(() => api.deny(row.id), t("list.denied"));
+              })()
+            }
+            onEnd={(row) =>
+              void (async () => {
+                const ok = await confirm({
+                  title:
+                    row.status === "pending"
+                      ? t("list.cancelConfirm")
+                      : t("list.endConfirm"),
+                  confirmLabel:
+                    row.status === "pending"
+                      ? t("list.cancel")
+                      : t("list.endNow"),
+                });
+                if (ok) await act(() => api.end(row.id), t("list.ended"));
+              })()
+            }
+          />
+        )}
+      </PanelShell>
+    </PanelFrame>
   );
 }

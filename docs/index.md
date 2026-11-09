@@ -11,6 +11,8 @@ Open the host in Manage and turn on Privileged host in its Privileged Access sec
 - Ask for a reason and Ask for a ticket: what a request must include.
 - Let background work through: plugin connections nobody waits on, like metrics polling, skip the approval. Off at first, so a host without access gets no background work either.
 
+Only people with `privileged-access.configure` (admins at first) can change this section, so someone with edit on a host can not turn it off. That holds for the host editor, host imports, bulk edits, host defaults and desktop sync.
+
 The check runs inside Termix for every SSH connection, file manager and tunnels included, and for every RDP, VNC and Telnet login, so no plugin can skip it.
 
 ## Ask for access

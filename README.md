@@ -26,6 +26,7 @@ Read the [docs](https://docs.termix.site/plugins/privileged-access) to set it up
 - Access ends on its own, and open sessions close when it does
 - Break glass access for emergencies, always audited and alerted
 - Every request and decision in the audit log, with a CSV report
+- A dashboard card with requests waiting on you and your open access
 
 <br />
 
