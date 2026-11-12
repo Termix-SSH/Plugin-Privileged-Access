@@ -1,0 +1,78 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Termix-SSH/Termix/main/scripts/authz/authz.schema.json",
+  "seed": [
+    {
+      "as": "owner",
+      "method": "POST",
+      "path": "/plugin-api/privileged-access/requests",
+      "body": {
+        "hostId": "{{host2}}",
+        "hours": 1,
+        "reason": "authz-own-reason"
+      },
+      "capture": {
+        "privileged-access.requests": "request.id"
+      }
+    }
+  ],
+  "routes": {
+    "GET /plugin-api/privileged-access/hosts": {
+      "access": "user",
+      "permission": "privileged-access.request"
+    },
+    "GET /plugin-api/privileged-access/report.csv": {
+      "access": "admin",
+      "permission": "privileged-access.request"
+    },
+    "GET /plugin-api/privileged-access/requests": {
+      "access": "user",
+      "permission": "privileged-access.request"
+    },
+    "POST /plugin-api/privileged-access/requests": {
+      "access": "user",
+      "permission": "privileged-access.request",
+      "resource": {
+        "kind": "host",
+        "min": "connect",
+        "key": "hostId"
+      }
+    },
+    "POST /plugin-api/privileged-access/requests/:id/approve": {
+      "access": "user",
+      "permission": "privileged-access.request",
+      "resource": {
+        "kind": "own",
+        "fixture": "privileged-access.requests"
+      },
+      "params": {
+        "id": "privileged-access.requests"
+      }
+    },
+    "POST /plugin-api/privileged-access/requests/:id/deny": {
+      "access": "user",
+      "permission": "privileged-access.request",
+      "resource": {
+        "kind": "own",
+        "fixture": "privileged-access.requests"
+      },
+      "params": {
+        "id": "privileged-access.requests"
+      }
+    },
+    "POST /plugin-api/privileged-access/requests/:id/end": {
+      "access": "user",
+      "permission": "privileged-access.request",
+      "resource": {
+        "kind": "own",
+        "fixture": "privileged-access.requests"
+      },
+      "params": {
+        "id": "privileged-access.requests"
+      }
+    },
+    "GET /plugin-api/privileged-access/summary": {
+      "access": "user",
+      "permission": "privileged-access.request"
+    }
+  }
+}
