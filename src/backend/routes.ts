@@ -167,6 +167,12 @@ export function registerRoutes(deps: {
    * @openapi
    * /plugin-api/privileged-access/requests/{id}/approve:
    *   post:
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
    *     summary: Approve an access request
    *     description: Needs privileged-access.approve and, when the host names approver roles, one of them. Nobody approves their own request.
    *     tags:
@@ -196,6 +202,12 @@ export function registerRoutes(deps: {
    * @openapi
    * /plugin-api/privileged-access/requests/{id}/deny:
    *   post:
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
    *     summary: Deny an access request
    *     tags:
    *       - Privileged Access
@@ -222,6 +234,12 @@ export function registerRoutes(deps: {
    * @openapi
    * /plugin-api/privileged-access/requests/{id}/end:
    *   post:
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: integer
    *     summary: Withdraw a request or end access early
    *     description: The requester, or someone who may approve it. Ending approved access closes the user's open sessions on the host.
    *     tags:
