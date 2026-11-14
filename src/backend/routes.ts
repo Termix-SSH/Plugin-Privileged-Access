@@ -1,4 +1,4 @@
-import express, { type Request, type Response, type Router } from "express";
+import type { Request, Response, Router } from "express";
 import type { PluginContext } from "@termix-ssh/plugin-sdk/backend";
 import type { AccessRequest, RequestStore } from "./store.js";
 import { APPROVE_PERMISSION, type AccessService } from "./access.js";
@@ -34,14 +34,15 @@ function idParam(req: Request): number | null {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
+/** Routes go on ctx's own router: a plugin process serves no sub-router. */
 export function registerRoutes(deps: {
+  router: Router;
   ctx: PluginContext;
   store: RequestStore;
   access: AccessService;
   workflow: Workflow;
 }): Router {
-  const { ctx, store, access, workflow } = deps;
-  const router = express.Router();
+  const { router, ctx, store, access, workflow } = deps;
   router.use(ctx.rbac.require("request") as never);
 
   const actor = (res: Response): string | null => {
